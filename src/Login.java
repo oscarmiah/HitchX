@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -40,7 +41,7 @@ public class Login extends javax.swing.JFrame {
      ResultSet rs;
     // Required for connections
     //DbName, Driver, Url, Username, Password
-    private static final String DbName = "pointofstorage";
+    private static final String DbName = "hitchx";
     private static final String DbDriver = "com.mysql.cj.jdbc.Driver";
     private static final String DbUrl = "jdbc:mysql://localhost:3306/"+DbName;
     private static final String DbUsername = "root";
@@ -75,10 +76,10 @@ public class Login extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtLogUsername = new javax.swing.JTextField();
-        txtLogPassword = new javax.swing.JTextField();
         login = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         Register = new javax.swing.JButton();
+        txtLogPassword = new javax.swing.JPasswordField();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -95,9 +96,6 @@ public class Login extends javax.swing.JFrame {
 
         txtLogUsername.setBackground(new java.awt.Color(255, 255, 255));
         txtLogUsername.setForeground(new java.awt.Color(0, 0, 0));
-
-        txtLogPassword.setBackground(new java.awt.Color(255, 255, 255));
-        txtLogPassword.setForeground(new java.awt.Color(0, 0, 0));
 
         login.setBackground(new java.awt.Color(0, 51, 255));
         login.setForeground(new java.awt.Color(255, 255, 255));
@@ -121,6 +119,14 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
+        txtLogPassword.setBackground(new java.awt.Color(255, 255, 255));
+        txtLogPassword.setForeground(new java.awt.Color(0, 0, 0));
+        txtLogPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtLogPasswordActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -134,11 +140,11 @@ public class Login extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtLogUsername))
+                                .addComponent(txtLogUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtLogPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(txtLogPassword))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -197,27 +203,41 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
-        // TODO add your handling code here:
-        String username,password;
-        
+         try {
+        String username, password;
         username = txtLogUsername.getText();
-        password = txtLogPassword.getText();
-        String queryLogin = "SELECT * from accountdetails where accUsername = "+username+" AND accPassword = "+password+"";
-        try { 
-            pst = con.prepareStatement(queryLogin);
-            ResultSet rs = pst.executeQuery();
-            if(!rs.next()){
-                JOptionPane.showMessageDialog(null, "invalid credentials");
-            }
-            else{
-                JOptionPane.showMessageDialog(null, "Account match");
-            }
+        char[] passwordChars  = txtLogPassword.getPassword();
+        password = new String(passwordChars);
+
+
+        String queryLogin = "SELECT * from accountdetails where accUsername = ? AND accPassword = ?";
+       PreparedStatement pst = con.prepareStatement(queryLogin);
+        pst.setString(1, username);
+        pst.setString(2, password);
+       ResultSet rs = null;
+        try {   
+            rs = pst.executeQuery();
         } catch (SQLException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-          
-    }//GEN-LAST:event_loginActionPerformed
 
+        if (rs.next()) {
+                  JOptionPane.showMessageDialog(null, "Account match");
+                  
+                  
+                   homepage home = new homepage();  // Assuming HomePage is your next frame
+            home.setVisible(true);
+            this.dispose(); // Close the login frame
+            
+            
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid Credentials");
+        }
+    }catch (SQLException ex){
+        Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }//GEN-LAST:event_loginActionPerformed
+ 
     private void RegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegisterActionPerformed
         // TODO add your handling code here:
         Registration Register = new Registration();
@@ -226,6 +246,10 @@ public class Login extends javax.swing.JFrame {
         Register.setLocationRelativeTo(null);
         this.dispose();
     }//GEN-LAST:event_RegisterActionPerformed
+
+    private void txtLogPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLogPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLogPasswordActionPerformed
 
     /**
      * @param args the command line arguments
@@ -270,7 +294,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton login;
-    private javax.swing.JTextField txtLogPassword;
+    private javax.swing.JPasswordField txtLogPassword;
     private javax.swing.JTextField txtLogUsername;
     // End of variables declaration//GEN-END:variables
 }

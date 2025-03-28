@@ -15,6 +15,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.sql.PreparedStatement;
 public class Registration extends javax.swing.JFrame {
 
     /**
@@ -37,9 +38,9 @@ public class Registration extends javax.swing.JFrame {
     
     // Required for connections
     //DbName, Driver, Url, Username, Password
-    private static final String DbName = "pointofstorage";
+    private static final String DbName = "hitchX";
     private static final String DbDriver = "com.mysql.cj.jdbc.Driver";
-    private static final String DbUrl = "jdbc:mysql://localhost:3306/"+DbName;
+    private static final String DbUrl = "jdbc:mysql://localhost:3306/" +DbName;
     private static final String DbUsername = "root";
     private static final String DbPassword = "";
     
@@ -154,12 +155,6 @@ public class Registration extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(Submit)
-                            .addComponent(jLabel1))
-                        .addGap(54, 54, 54))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
@@ -168,15 +163,21 @@ public class Registration extends javax.swing.JFrame {
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap(26, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(txtRegUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtRegPassword)))
-                        .addGap(48, 48, 48))))
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtRegPassword)
+                        .addGap(48, 48, 48))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(Submit)
+                                    .addComponent(jLabel1))
+                                .addGap(54, 54, 54))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addComponent(txtRegUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(48, 48, 48))))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -187,13 +188,13 @@ public class Registration extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtRegUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(txtRegPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(9, 9, 9)
+                    .addComponent(txtRegPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
                 .addComponent(Submit)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(login))
@@ -225,27 +226,34 @@ public class Registration extends javax.swing.JFrame {
     private void SubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SubmitActionPerformed
         // TODO add your handling code here:
         String username, password;
-        if ("".equals(txtRegUsername.getText())) {
+        if ("".equals(txtRegUsername.getText())){
             JOptionPane.showMessageDialog(new JFrame(),"Required Username");
+            return;           
         }
-         if ("".equals(txtRegPassword.getText())) {
+
+        if ("".equals(txtRegPassword.getText())){
             JOptionPane.showMessageDialog(new JFrame(),"Required Password");
+            return;
         }
-         else{
-             username = txtRegUsername.getText();
-             password = txtRegPassword.getText();
+        else{
+            username = txtRegUsername.getText();
+            password = txtRegPassword.getText();
+
              
-             String queryRegister = "INSERT into accountdetails(accUsername, accPassword)"
-                    + "VALUES ("+username+","+password+")";
-            try {
-                st.execute(queryRegister);
-            } catch (SQLException ex) {
-                Logger.getLogger(Registration.class.getName()).log(Level.SEVERE, null, ex);
+  String queryRegister = "INSERT INTO accountdetails(accUsername, accPassword) VALUES (?, ?)";
+
+try (PreparedStatement pst = con.prepareStatement(queryRegister)){
+                              pst.setString(1, username);
+                              pst.setString(2, password);
+                              pst.executeUpdate();
+                           JOptionPane.showMessageDialog(new JFrame(), "Data added successfully");
+                           txtRegUsername.setText(" ");
+                           txtRegPassword.setText(" ");
+                          } catch (SQLException ex) {
+                    Logger.getLogger(Registration.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(new JFrame(), "Account is alredy registerd");
             }
-            JOptionPane.showMessageDialog(new JFrame(),"Data added successfully");
-            txtRegUsername.setText(" ");
-            txtRegPassword.setText(" ");
-         }
+        }
     }//GEN-LAST:event_SubmitActionPerformed
 
     private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
